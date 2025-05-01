@@ -19,14 +19,13 @@ pipeline {
       }
       stage('Build') {
          steps {
-            script {
-               // Ejecutar Maven dentro de un contenedor Docker para el build
-               docker.image('maven:3.9.4-eclipse-temurin-21').inside('-v $HOME/.m2:/root/.m2:z') {
-                  sh '''
-                    mvn clean install -X
-                  '''
+             try {
+                  docker.image('maven:3.9.4-eclipse-temurin-21').inside('-v $HOME/.m2:/root/.m2:ro') {
+                     sh 'mvn clean install -X'
+                  }
+               } catch (Exception e) {
+                  error("Error durante el build: ${e.message}")
                }
-            }
          }
       }
       stage('Testing') {
