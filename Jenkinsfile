@@ -3,7 +3,7 @@ pipeline {
    environment {
       GIT_REPO = 'Pruebas_Proyecto_Caminatas'
       GIT_CREDENTIAL_ID = 'Github-token' // Actualiza esto con el ID correcto de las credenciales de Git en Jenkins
-      SONARQUBE_URL = 'http://localhost:9004' // URL de tu SonarQube
+      SONARQUBE_URL = 'http://sonarqube:9004' // URL de tu SonarQube
       SONAR_TOKEN = credentials('Sonar-token') // Asegúrate de que este ID coincida con el token almacenado en Jenkins
    }
    stages {
@@ -21,7 +21,7 @@ pipeline {
          steps {
             script {
                // Ejecutar Maven dentro de un contenedor Docker para el build
-               docker.image('jenkins').inside('-v $HOME/.m2:/root/.m2:z -u root') {
+               docker.image('maven:3.9.4-eclipse-temurin-21').inside('-v $HOME/.m2:/root/.m2:z') {
                   sh '''
                     apt-get update
                     apt-get install -y maven
@@ -36,7 +36,7 @@ pipeline {
          steps {
             script {
                // Ejecutar pruebas unitarias dentro de un contenedor Docker
-               docker.image('jenkins').inside('-v $HOME/.m2:/root/.m2:z -u root') {
+               docker.image('maven:3.9.4-eclipse-temurin-21').inside('-v $HOME/.m2:/root/.m2:z')  {
                   sh '''
                      mvn test
                   '''
@@ -48,7 +48,7 @@ pipeline {
          steps {
             script {
                // Ejecutar análisis estático con SonarQube
-               docker.image('jenkins').inside('-v $HOME/.m2:/root/.m2:z -u root') {
+               docker.('maven:3.9.4-eclipse-temurin-21').inside('-v $HOME/.m2:/root/.m2:z')  {
                   sh '''
                      mvn sonar:sonar -Dsonar.token=${SONAR_TOKEN} -Dsonar.host.url=${SONARQUBE_URL}
                   '''
