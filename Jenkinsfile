@@ -23,8 +23,6 @@ pipeline {
                // Ejecutar Maven dentro de un contenedor Docker para el build
                docker.image('maven:3.9.4-eclipse-temurin-21').inside('-v $HOME/.m2:/root/.m2:z') {
                   sh '''
-                    apt-get update
-                    apt-get install -y maven
                     java -version
                     mvn clean install
                   '''
@@ -48,7 +46,7 @@ pipeline {
          steps {
             script {
                // Ejecutar análisis estático con SonarQube
-               docker.('maven:3.9.4-eclipse-temurin-21').inside('-v $HOME/.m2:/root/.m2:z')  {
+               docker.image('maven:3.9.4-eclipse-temurin-21').inside('-v $HOME/.m2:/root/.m2:z')  {
                   sh '''
                      mvn sonar:sonar -Dsonar.token=${SONAR_TOKEN} -Dsonar.host.url=${SONARQUBE_URL}
                   '''
