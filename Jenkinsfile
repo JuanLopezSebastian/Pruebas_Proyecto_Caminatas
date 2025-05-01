@@ -23,7 +23,6 @@ pipeline {
                // Ejecutar Maven dentro de un contenedor Docker para el build
                docker.image('maven:3.9.4-eclipse-temurin-21').inside('-v $HOME/.m2:/root/.m2:z') {
                   sh '''
-                    java -version
                     mvn clean install
                   '''
                }
