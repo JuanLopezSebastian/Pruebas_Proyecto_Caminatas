@@ -27,6 +27,7 @@ pipeline {
                } catch (Exception e) {
                   error("Error durante el build: ${e.message}")
                }
+            }
          }
       }
       stage('Testing') {
