@@ -1,39 +1,42 @@
-pipeline { 
-   agent any 
+pipeline {
+   agent any
    environment {
-      GIT_REPO = 'MP_202510_G81_E3_Caminatas_Back'
-      GIT_CREDENTIAL_ID = 'c0e8826e-5e2c-4c1c-a484-6c17d53ac539'
-      SONARQUBE_URL = 'http://10.20.84.26:8082/sonar'
-      SONAR_TOKEN = credentials('sonar-login')
+      GIT_REPO = 'Pruebas_Proyecto_Caminatas'
+      GIT_CREDENTIAL_ID = 'Github-token' // Actualiza esto con el ID correcto de las credenciales de Git en Jenkins
+      SONARQUBE_URL = 'http://localhost:9004' // URL de tu SonarQube
+      SONAR_TOKEN = credentials('Sonar-token') // Asegúrate de que este ID coincida con el token almacenado en Jenkins
    }
-   stages { 
-      stage('Checkout') { 
+   stages {
+      stage('Checkout') {
          steps {
-            scmSkip(deleteBuild: true, skipPattern:'.*\\[ci-skip\\].*')
+            scmSkip(deleteBuild: true, skipPattern:'.*\\[ci-skip\\].*') // Esta es una función extra que puedes usar para omitir el build si hay un [ci-skip] en el commit message
 
-            git branch: 'main', 
+            // Checkout del repositorio
+            git branch: 'main',
                credentialsId: env.GIT_CREDENTIAL_ID,
-               url: 'https://github.com/UDFJDC-ModelosProgramacion/' + env.GIT_REPO
+               url: 'https://github.com/JuanLopezSebastian/' + env.GIT_REPO + '.git'
          }
       }
       stage('Build') {
-         // Build artifacts
          steps {
             script {
-               docker.image('citools-isis2603:latest').inside('-v $HOME/.m2:/root/.m2:z -u root') {
+               // Ejecutar Maven dentro de un contenedor Docker para el build
+               docker.image('jenkins').inside('-v $HOME/.m2:/root/.m2:z -u root') {
                   sh '''
-                     java -version
-                     mvn clean install
+                    apt-get update
+                    apt-get install -y maven
+                    java -version
+                    mvn clean install
                   '''
                }
             }
          }
       }
       stage('Testing') {
-         // Run unit tests
          steps {
             script {
-               docker.image('citools-isis2603:latest').inside('-v $HOME/.m2:/root/.m2:z -u root') {                  
+               // Ejecutar pruebas unitarias dentro de un contenedor Docker
+               docker.image('jenkins').inside('-v $HOME/.m2:/root/.m2:z -u root') {
                   sh '''
                      mvn test
                   '''
@@ -42,10 +45,10 @@ pipeline {
          }
       }
       stage('Static Analysis') {
-         // Run static analysis
          steps {
             script {
-               docker.image('citools-isis2603:latest').inside('-v $HOME/.m2:/root/.m2:z -u root') {
+               // Ejecutar análisis estático con SonarQube
+               docker.image('jenkins').inside('-v $HOME/.m2:/root/.m2:z -u root') {
                   sh '''
                      mvn sonar:sonar -Dsonar.token=${SONAR_TOKEN} -Dsonar.host.url=${SONARQUBE_URL}
                   '''
@@ -56,11 +59,11 @@ pipeline {
    }
    post {
       always {
-        cleanWs()
-        deleteDir() 
-        dir("${env.GIT_REPO}@tmp") {
-          deleteDir()
-        }
+         cleanWs() // Limpia el espacio de trabajo después del build
+         deleteDir() // Elimina los archivos temporales
+         dir("${env.GIT_REPO}@tmp") {
+            deleteDir() // Elimina directorios temporales relacionados con el repo
+         }
       }
    }
 }
