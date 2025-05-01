@@ -19,7 +19,8 @@ pipeline {
       }
       stage('Build') {
          steps {
-             try {
+             script {
+               try {
                   docker.image('maven:3.9.4-eclipse-temurin-21').inside('-v $HOME/.m2:/root/.m2:ro') {
                      sh 'mvn clean install -X'
                   }
