@@ -15,6 +15,7 @@ C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Camin
 C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Caminatas\src\main\java\co\edu\udistrital\mdp\caminatas\repositories\TransaccionesRepositories\I_InscripcionUsuarioRepository.java
 C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Caminatas\src\main\java\co\edu\udistrital\mdp\caminatas\entities\UsuariosEntities\UsuarioJuridicoEntity.java
 C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Caminatas\src\main\java\co\edu\udistrital\mdp\caminatas\services\TransaccionesServices\InscripcionUsuarioService.java
+C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Caminatas\src\main\java\co\edu\udistrital\mdp\caminatas\test\Main.java
 C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Caminatas\src\main\java\co\edu\udistrital\mdp\caminatas\entities\ContenidoCaminatasEntities\CalendarioEntity.java
 C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Caminatas\src\main\java\co\edu\udistrital\mdp\caminatas\controllers\ContenidoCaminatasControllers\BlogController.java
 C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Caminatas\src\main\java\co\edu\udistrital\mdp\caminatas\repositories\SegurosRepositories\I_SeguroBasicoObligatorioRepository.java
@@ -66,6 +67,7 @@ C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Camin
 C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Caminatas\src\main\java\co\edu\udistrital\mdp\caminatas\repositories\SegurosRepositories\I_SeguroJuridicoRepository.java
 C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Caminatas\src\main\java\co\edu\udistrital\mdp\caminatas\entities\UsuariosEntities\AdministradorAppEntity.java
 C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Caminatas\src\main\java\co\edu\udistrital\mdp\caminatas\controllers\CaminatasControllers\CaminataController.java
+C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Caminatas\src\main\java\co\edu\udistrital\mdp\caminatas\test\Persona.java
 C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Caminatas\src\main\java\co\edu\udistrital\mdp\caminatas\repositories\UsuariosRepositories\I_UsuarioNaturalRepository.java
 C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Caminatas\src\main\java\co\edu\udistrital\mdp\caminatas\podam\DateStrategy.java
 C:\Users\lopez\OneDrive\Desktop\Pruebas_Proyecto_Caminata\Pruebas_Proyecto_Caminatas\src\main\java\co\edu\udistrital\mdp\caminatas\repositories\SegurosRepositories\I_SeguroRepository.java

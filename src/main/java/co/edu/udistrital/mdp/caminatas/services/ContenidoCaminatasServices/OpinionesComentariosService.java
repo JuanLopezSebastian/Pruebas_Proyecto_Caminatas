@@ -2,6 +2,8 @@ package co.edu.udistrital.mdp.caminatas.services.ContenidoCaminatasServices;
 
 import co.edu.udistrital.mdp.caminatas.entities.ContenidoCaminatasEntities.OpinionesComentariosEntity;
 import co.edu.udistrital.mdp.caminatas.repositories.ContenidoCaminatasRepositories.I_OpinionesComentariosRepository;
+import co.edu.udistrital.mdp.caminatas.repositories.TransaccionesRepositories.I_InscripcionUsuarioRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +17,8 @@ public class OpinionesComentariosService {
     private I_OpinionesComentariosRepository comentarioRepository;
 
     @Autowired
-    private I_OpinionesComentariosRepository inscripcionRepository;
+    private I_InscripcionUsuarioRepository inscripcionRepository;
+
 
     public List<OpinionesComentariosEntity> findAll() {
         return comentarioRepository.findAll();

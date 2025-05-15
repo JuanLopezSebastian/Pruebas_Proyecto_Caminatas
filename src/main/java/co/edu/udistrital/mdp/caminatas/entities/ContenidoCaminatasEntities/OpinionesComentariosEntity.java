@@ -12,10 +12,6 @@ import lombok.EqualsAndHashCode;
 @Table(name = "comentarios")
 @EqualsAndHashCode(callSuper = true)
 public class OpinionesComentariosEntity extends BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     
     @Column(length = 500)
     private String descripcionComentario;

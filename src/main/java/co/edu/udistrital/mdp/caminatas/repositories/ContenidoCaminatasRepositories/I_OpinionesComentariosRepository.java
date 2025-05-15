@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface I_OpinionesComentariosRepository extends JpaRepository<OpinionesComentariosEntity, Long> {
-    boolean existsByUsuario_IdAndCaminata_Id(Long usuarioId, Long caminataId);
 
 }
