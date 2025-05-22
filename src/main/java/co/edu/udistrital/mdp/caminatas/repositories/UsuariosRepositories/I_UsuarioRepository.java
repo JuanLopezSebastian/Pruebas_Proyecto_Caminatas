@@ -7,6 +7,10 @@ import co.edu.udistrital.mdp.caminatas.entities.UsuariosEntities.UsuarioEntity;
 @Repository
 public interface I_UsuarioRepository extends JpaRepository<UsuarioEntity, Long> {
     UsuarioEntity findByCorreo(String correo);
+    boolean existsByCorreo(String correo);
+    boolean existsByCedula(Long cedula);
+    boolean existsByNombreUsuario(String nombreUsuario);
+
 }
 
 

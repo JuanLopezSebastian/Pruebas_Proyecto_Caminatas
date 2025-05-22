@@ -2,7 +2,7 @@ package co.edu.udistrital.mdp.caminatas.services.ContenidoCaminatasServices;
 
 import co.edu.udistrital.mdp.caminatas.entities.ContenidoCaminatasEntities.OpinionesComentariosEntity;
 import co.edu.udistrital.mdp.caminatas.repositories.ContenidoCaminatasRepositories.I_OpinionesComentariosRepository;
-import co.edu.udistrital.mdp.caminatas.repositories.TransaccionesRepositories.I_InscripcionUsuarioRepository;
+import co.edu.udistrital.mdp.caminatas.repositories.InscripcionesRepositories.I_InscripcionUsuarioRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
