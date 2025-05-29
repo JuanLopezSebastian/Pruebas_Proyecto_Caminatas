@@ -1,20 +1,31 @@
 package co.edu.udistrital.mdp.caminatas.services.InscripcionesServices;
 
 
+import co.edu.udistrital.mdp.caminatas.dto.RequestDTO.InscripcionesDTO.InscripcionUsuarioDTO;
+import co.edu.udistrital.mdp.caminatas.dto.ResponsesDTO.InscripcionesResponsesDTO.InscripcionUsuarioResponseDTO;
+import co.edu.udistrital.mdp.caminatas.entities.CaminatasEntities.CaminataEntity;
 import co.edu.udistrital.mdp.caminatas.entities.InscripcionesEntities.InscripcionUsuarioEntity;
+import co.edu.udistrital.mdp.caminatas.entities.UsuariosEntities.UsuarioNaturalEntity;
+import co.edu.udistrital.mdp.caminatas.exceptions.http.ConflictException;
+import co.edu.udistrital.mdp.caminatas.exceptions.http.NotFoundException;
+import co.edu.udistrital.mdp.caminatas.repositories.CaminatasRepositories.I_CaminataRepository;
 import co.edu.udistrital.mdp.caminatas.repositories.InscripcionesRepositories.I_InscripcionUsuarioRepository;
+import co.edu.udistrital.mdp.caminatas.repositories.UsuariosRepositories.I_UsuarioNaturalRepository;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class InscripcionUsuarioService {
 
-    @Autowired
-    private I_InscripcionUsuarioRepository inscripcionUsuarioRepository;
+    private final I_InscripcionUsuarioRepository inscripcionUsuarioRepository;
+    private final I_UsuarioNaturalRepository usuarioNaturalRepository;
+    private final I_CaminataRepository caminataRepository;
 
     public List<InscripcionUsuarioEntity> findAll() {
         return inscripcionUsuarioRepository.findAll();
@@ -24,12 +35,51 @@ public class InscripcionUsuarioService {
         return inscripcionUsuarioRepository.findById(id);
     }
 
+    public void delete(Long id) {
+        inscripcionUsuarioRepository.deleteById(id);
+    }
+
     public InscripcionUsuarioEntity save(InscripcionUsuarioEntity inscripcion) {
         return inscripcionUsuarioRepository.save(inscripcion);
     }
 
-    public void delete(Long id) {
-        inscripcionUsuarioRepository.deleteById(id);
-    }
-}
+    public InscripcionUsuarioEntity registrarDesdeDTO(InscripcionUsuarioDTO dto) {
+        if (inscripcionUsuarioRepository.existsByUsuario_IdAndCaminata_Id(dto.getIdUsuario(), dto.getIdCaminata())) {
+            throw new ConflictException("⚠ El usuario ya tiene una inscripción en esta caminata.");
+        }
 
+        UsuarioNaturalEntity usuario = usuarioNaturalRepository.findById(dto.getIdUsuario())
+            .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        CaminataEntity caminata = caminataRepository.findById(dto.getIdCaminata())
+            .orElseThrow(() -> new NotFoundException("Caminata no encontrada"));
+
+        InscripcionUsuarioEntity inscripcion = new InscripcionUsuarioEntity();
+        inscripcion.setUsuario(usuario);
+        inscripcion.setCaminata(caminata);
+        inscripcion.setFechaInscripcion(dto.getFechaInscripcion() != null ? dto.getFechaInscripcion() : LocalDate.now());
+        inscripcion.setEstadoPago(false);
+
+        return inscripcionUsuarioRepository.save(inscripcion);
+    }
+    
+    public InscripcionUsuarioResponseDTO toResponseDTO(InscripcionUsuarioEntity inscripcion) {
+        InscripcionUsuarioResponseDTO dto = new InscripcionUsuarioResponseDTO();
+        dto.setId(inscripcion.getId());
+        dto.setFechaInscripcion(inscripcion.getFechaInscripcion());
+        dto.setEstadoPago(inscripcion.getEstadoPago());
+
+        if (inscripcion.getUsuario() != null) {
+            dto.setUsuarioId(inscripcion.getUsuario().getId());
+            dto.setNombreUsuario(inscripcion.getUsuario().getNombreUsuario());
+        }
+
+        if (inscripcion.getCaminata() != null) {
+            dto.setCaminataId(inscripcion.getCaminata().getId());
+            dto.setNombreCaminata(inscripcion.getCaminata().getNombreCaminata());
+        }
+
+        return dto;
+    }
+
+}

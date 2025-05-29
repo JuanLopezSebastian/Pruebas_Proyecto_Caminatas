@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import co.edu.udistrital.mdp.caminatas.entities.BaseEntities.BaseEntity;
@@ -14,9 +15,11 @@ import co.edu.udistrital.mdp.caminatas.entities.BaseEntities.BaseEntity;
 @EqualsAndHashCode(callSuper = true)
 public class GaleriaEntity extends BaseEntity {
 
-    @Column
+    @Column(nullable = false)
     private String imagenPrincipal;
 
     @ElementCollection
-    private List<String> imagenesGaleria;
+    @CollectionTable(name = "imagenes_galeria", joinColumns = @JoinColumn(name = "galeria_id"))
+    private List<String> imagenesGaleria = new ArrayList<>();
 }
+

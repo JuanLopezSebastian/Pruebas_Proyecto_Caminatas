@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import co.edu.udistrital.mdp.caminatas.entities.BaseEntities.BaseEntity;
@@ -14,22 +15,27 @@ import co.edu.udistrital.mdp.caminatas.entities.UsuariosEntities.UsuarioNaturalE
 @Table(name = "blogs")
 @EqualsAndHashCode(callSuper = true)
 public class BlogEntity extends BaseEntity {
-    
-    @Id
-    private Long id;
+
+    @Column(nullable = false)
     private String title;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "autor_id", nullable = false)
     private UsuarioNaturalEntity autor;
 
     @ElementCollection
-    private List<String> imagenes;
+    @CollectionTable(name = "blog_imagenes", joinColumns = @JoinColumn(name = "blog_id"))
+    private List<String> imagenes = new ArrayList<>();
 
     @ElementCollection
-    private List<String> videos;
+    @CollectionTable(name = "blog_videos", joinColumns = @JoinColumn(name = "blog_id"))
+    private List<String> videos = new ArrayList<>();
 
     @Column(columnDefinition = "TEXT")
     private String contenidoTextoBlog;
 }
+
 

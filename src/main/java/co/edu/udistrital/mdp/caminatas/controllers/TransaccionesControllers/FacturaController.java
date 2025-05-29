@@ -1,92 +1,78 @@
 package co.edu.udistrital.mdp.caminatas.controllers.TransaccionesControllers;
 
-import co.edu.udistrital.mdp.caminatas.dto.TransaccionesDTO.FacturaDTO;
+import co.edu.udistrital.mdp.caminatas.config.SecurityConfiguration.CustomUserDetails;
+import co.edu.udistrital.mdp.caminatas.dto.RequestDTO.TransaccionesDTO.FacturaDTO;
+import co.edu.udistrital.mdp.caminatas.dto.ResponsesDTO.TransaccionesResponsesDTO.FacturaResponseDTO;
 import co.edu.udistrital.mdp.caminatas.entities.TransaccionesEntities.FacturaEntity;
-import co.edu.udistrital.mdp.caminatas.entities.TransaccionesEntities.PagoEntity;
+import co.edu.udistrital.mdp.caminatas.entities.UsuariosEntities.UsuarioEntity;
+import co.edu.udistrital.mdp.caminatas.exceptions.http.NotFoundException;
 import co.edu.udistrital.mdp.caminatas.services.TransaccionesServices.FacturaService;
+import co.edu.udistrital.mdp.caminatas.services.UsuariosServices.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Facturas", description = "Emisión de facturas asociadas a pagos")
+@Tag(name = "Facturas", description = "Gestión de facturación para inscripciones de caminatas")
 @RestController
 @RequestMapping("/facturas")
+@RequiredArgsConstructor
 public class FacturaController {
 
-    @Autowired
-    private FacturaService facturaService;
+    private final FacturaService facturaService;
+    private final UsuarioService usuarioService;
 
-    @Operation(summary = "Obtener una lista de facturas", description = "Obtiene una lista de todas las facturas")
+    @Operation(summary = "Generar factura para una inscripción", 
+        description = "Genera una factura con seguros aplicables para el usuario autenticado")
+    @ApiResponse(responseCode = "201", description = "Factura generada exitosamente")
+    @PreAuthorize("hasRole('NATURAL') or hasRole('JURIDICO')")
+    @PostMapping("/generar")
+    public ResponseEntity<FacturaResponseDTO> generarFactura(
+            @Valid @RequestBody FacturaDTO dto,
+            @AuthenticationPrincipal CustomUserDetails userDetails) {
+
+        UsuarioEntity usuario = usuarioService.findByCorreo(userDetails.getUsername())
+            .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        FacturaEntity factura = facturaService.generarFacturaDesdeDTO(dto, usuario);
+        FacturaResponseDTO response = facturaService.toResponseDTO(factura);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Operation(summary = "Obtener todas las facturas")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @GetMapping
-    public ResponseEntity<List<FacturaEntity>> getAll() {
-        return ResponseEntity.ok(facturaService.findAll());
+    public ResponseEntity<List<FacturaResponseDTO>> getAll() {
+        List<FacturaResponseDTO> facturas = facturaService.findAll().stream()
+            .map(facturaService::toResponseDTO)
+            .toList();
+        return ResponseEntity.ok(facturas);
     }
 
-    @Operation(summary = "Obtener una factura por ID", description = "Obtiene una factura{ID}")
+    @Operation(summary = "Obtener una factura por ID")
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'NATURAL', 'JURIDICO')")
     @GetMapping("/{id}")
-    public ResponseEntity<FacturaEntity> getById(@PathVariable Long id) {
+    public ResponseEntity<FacturaResponseDTO> getById(@PathVariable Long id) {
         return facturaService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-    /*
-    @PostMapping
-    public ResponseEntity<FacturaEntity> create(@RequestBody FacturaEntity factura) {
-        return ResponseEntity.status(201).body(facturaService.save(factura));
-    }
-    */
-    @Operation(summary = "Crear una factura por ID", description = "Crea una factura{ID}")
-    @PostMapping
-    public ResponseEntity<FacturaEntity> create(@Valid @RequestBody FacturaDTO dto) {
-        FacturaEntity factura = new FacturaEntity();
-
-        PagoEntity pago = new PagoEntity();
-        pago.setId(dto.getIdPago());
-
-        factura.setIdFactura(dto.getIdFactura());
-        factura.setPago(pago);
-
-        return ResponseEntity.status(201).body(facturaService.save(factura));
+            .map(facturaService::toResponseDTO)
+            .map(ResponseEntity::ok)
+            .orElse(ResponseEntity.notFound().build());
     }
 
-    /*
-    @PutMapping("/{id}")
-    public ResponseEntity<FacturaEntity> update(@PathVariable Long id, @RequestBody FacturaEntity factura) {
-        return facturaService.findById(id)
-                .map(f -> {
-                    factura.setId(id);
-                    return ResponseEntity.ok(facturaService.save(factura));
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-    */
-    @Operation(summary = "Actualizar una factura por ID", description = "Actualiza una factura{ID}")
-    @PutMapping("/{id}")
-    public ResponseEntity<FacturaEntity> update(@PathVariable Long id, @Valid @RequestBody FacturaDTO dto) {
-        return facturaService.findById(id)
-                .map(existing -> {
-                    existing.setIdFactura(dto.getIdFactura());
-
-                    PagoEntity pago = new PagoEntity();
-                    pago.setId(dto.getIdPago());
-                    existing.setPago(pago);
-
-                    return ResponseEntity.ok(facturaService.save(existing));
-                })
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @Operation(summary = "Elimina una factura por ID", description = "Elimina una factura{ID}")
+    @Operation(summary = "Eliminar una factura por ID")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         facturaService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
-

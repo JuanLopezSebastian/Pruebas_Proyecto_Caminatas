@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface I_FacturaRepository extends JpaRepository<FacturaEntity, Long> {
+    boolean existsByInscripcion_Id(Long inscripcionId);
     
 }

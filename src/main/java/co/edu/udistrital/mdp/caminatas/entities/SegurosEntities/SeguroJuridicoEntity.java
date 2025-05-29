@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "seguros_juridicos")
 @EqualsAndHashCode(callSuper = true)
 public class SeguroJuridicoEntity extends SeguroEntity {
-    @Column
+
+    @Column(nullable = false)
     private String tipoSeguro;
 }

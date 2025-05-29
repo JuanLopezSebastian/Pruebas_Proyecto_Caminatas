@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class CaminataDeportivaEntity extends CaminataEntity {
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "modalidadCaminataDeportiva_id")
     private ModalidadCaminataDeportivaEntity modalidadCaminataDeportiva;
 }

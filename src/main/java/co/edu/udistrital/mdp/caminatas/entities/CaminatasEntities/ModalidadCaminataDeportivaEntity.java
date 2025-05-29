@@ -22,7 +22,9 @@ public class ModalidadCaminataDeportivaEntity extends BaseEntity {
     private String premios;
     private String patrocinador;
 
-    @ManyToOne
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ganador_id")
     private UsuarioEntity ganador;
 }
 

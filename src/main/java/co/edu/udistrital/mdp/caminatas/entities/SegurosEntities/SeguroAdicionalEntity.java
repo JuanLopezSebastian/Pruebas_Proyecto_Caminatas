@@ -7,6 +7,7 @@ import lombok.EqualsAndHashCode;
 @Table(name = "seguros_adicionales")
 @EqualsAndHashCode(callSuper = true)
 public class SeguroAdicionalEntity extends SeguroEntity {
-    @Column
+
+    @Column(length = 500)
     private String descripcionSeguroAdicional;
 }

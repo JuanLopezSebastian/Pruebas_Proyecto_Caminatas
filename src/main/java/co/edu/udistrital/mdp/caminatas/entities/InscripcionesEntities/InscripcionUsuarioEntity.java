@@ -11,19 +11,24 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @Entity
-@Table(name = "inscripciones")
+@Table(name = "inscripciones", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"usuario_id", "caminata_id"})
+})
 @EqualsAndHashCode(callSuper = true)
 public class InscripcionUsuarioEntity extends BaseEntity {
 
-    @Column
+    @Column(nullable = false)
     private LocalDate fechaInscripcion;
 
-    @Column
-    private Boolean estadoPago;
+    @Column(nullable = false)
+    private Boolean estadoPago = false;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "usuario_id", nullable = false)
     private UsuarioNaturalEntity usuario;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "caminata_id", nullable = false)
     private CaminataEntity caminata;
 }
+

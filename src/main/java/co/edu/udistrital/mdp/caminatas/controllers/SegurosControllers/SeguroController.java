@@ -5,7 +5,6 @@ import co.edu.udistrital.mdp.caminatas.services.SegurosServices.SeguroService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,8 +15,18 @@ import java.util.List;
 @RequestMapping("/seguros")
 public class SeguroController {
 
-    @Autowired
-    private SeguroService seguroService;
+    private final SeguroService seguroService;
+
+    // Constructor para inyección de dependencias
+    public SeguroController(SeguroService seguroService) {
+        this.seguroService = seguroService;
+    }
+
+    @Operation(summary = "Crear una factura por ID", description = "Crea una factura{ID}")
+    @PostMapping
+    public ResponseEntity<SeguroEntity> create(@RequestBody SeguroEntity seguro) {
+        return ResponseEntity.status(201).body(seguroService.save(seguro));
+    }
 
     @Operation(summary = "Obtener una lista de seguros", description = "Obtiene una lista de todos los seguros registrados")
     @GetMapping
@@ -31,12 +40,6 @@ public class SeguroController {
         return seguroService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    @Operation(summary = "Crear una factura por ID", description = "Crea una factura{ID}")
-    @PostMapping
-    public ResponseEntity<SeguroEntity> create(@RequestBody SeguroEntity seguro) {
-        return ResponseEntity.status(201).body(seguroService.save(seguro));
     }
 
     @Operation(summary = "Actualizar una factura por ID", description = "Actualizar una factura{ID}")

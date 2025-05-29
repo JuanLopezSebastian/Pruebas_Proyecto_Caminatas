@@ -1,16 +1,17 @@
 package co.edu.udistrital.mdp.caminatas.controllers.InscripcionesControllers;
 
-import co.edu.udistrital.mdp.caminatas.dto.InscripcionesDTO.InscripcionUsuarioDTO;
-import co.edu.udistrital.mdp.caminatas.entities.CaminatasEntities.CaminataEntity;
+import co.edu.udistrital.mdp.caminatas.dto.RequestDTO.InscripcionesDTO.InscripcionUsuarioDTO;
+import co.edu.udistrital.mdp.caminatas.dto.ResponsesDTO.InscripcionesResponsesDTO.InscripcionUsuarioResponseDTO;
 import co.edu.udistrital.mdp.caminatas.entities.InscripcionesEntities.InscripcionUsuarioEntity;
-import co.edu.udistrital.mdp.caminatas.entities.UsuariosEntities.UsuarioNaturalEntity;
 import co.edu.udistrital.mdp.caminatas.services.InscripcionesServices.InscripcionUsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,75 +19,41 @@ import java.util.List;
 @Tag(name = "Inscripciones", description = "Manejo de inscripciones de usuarios a caminatas")
 @RestController
 @RequestMapping("/inscripciones")
+@RequiredArgsConstructor
 public class InscripcionUsuarioController {
 
-    @Autowired
-    private InscripcionUsuarioService inscripcionUsuarioService;
+    private final InscripcionUsuarioService inscripcionUsuarioService;
 
-    @Operation(summary = "Obtener una lista de inscripciones", description = "Obtiene una lista de todas las inscripciones")
+    @PreAuthorize("hasAnyRole('NATURAL', 'JURIDICO')")
+    @Operation(summary = "Registrar inscripción de un usuario a una caminata")
+    @PostMapping
+    public ResponseEntity<InscripcionUsuarioEntity> registrar(@Valid @RequestBody InscripcionUsuarioDTO dto) {
+        InscripcionUsuarioEntity inscripcion = inscripcionUsuarioService.registrarDesdeDTO(dto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(inscripcion);
+    }
+
+    @Operation(summary = "Listar todas las inscripciones")
     @GetMapping
-    public ResponseEntity<List<InscripcionUsuarioEntity>> getAll() {
-        return ResponseEntity.ok(inscripcionUsuarioService.findAll());
+    public ResponseEntity<List<InscripcionUsuarioResponseDTO>> getAll() {
+        List<InscripcionUsuarioResponseDTO> result = inscripcionUsuarioService.findAll().stream()
+            .map(inscripcionUsuarioService::toResponseDTO)
+            .toList();
+        return ResponseEntity.ok(result);
     }
 
-    @Operation(summary = "Obtener un usuario natural por ID", description = "Obtiene un usuario{ID}")
+    @Operation(summary = "Obtener inscripción por ID")
     @GetMapping("/{id}")
-    public ResponseEntity<InscripcionUsuarioEntity> getById(@PathVariable Long id) {
+    public ResponseEntity<InscripcionUsuarioResponseDTO> getById(@PathVariable Long id) {
         return inscripcionUsuarioService.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-    /*
-    @PostMapping
-    public ResponseEntity<InscripcionUsuarioEntity> create(@RequestBody InscripcionUsuarioEntity inscripcion) {
-        return ResponseEntity.status(201).body(inscripcionUsuarioService.save(inscripcion));
-    }
-    */
-    @Operation(summary = "Obtener una inscripción por ID", description = "Obtiene una inscripcion{ID}")
-    @PostMapping
-    public ResponseEntity<InscripcionUsuarioEntity> create(@Valid @RequestBody InscripcionUsuarioDTO dto) {
-        InscripcionUsuarioEntity inscripcion = new InscripcionUsuarioEntity();
-
-        UsuarioNaturalEntity usuario = new UsuarioNaturalEntity();
-        usuario.setId(dto.getIdUsuario());
-
-        CaminataEntity caminata = new CaminataEntity();
-        caminata.setId(dto.getIdCaminata());
-
-        inscripcion.setUsuario(usuario);
-        inscripcion.setCaminata(caminata);
-        inscripcion.setFechaInscripcion(dto.getFechaInscripcion());
-        inscripcion.setEstadoPago(dto.getEstadoPago());
-
-        return ResponseEntity.status(201).body(inscripcionUsuarioService.save(inscripcion));
-    }
-
-    @Operation(summary = "Actualizar una inscripción por ID", description = "Actualizar una inscripcion{ID}")
-    @PutMapping("/{id}")
-    public ResponseEntity<InscripcionUsuarioEntity> update(@PathVariable Long id, @Valid @RequestBody InscripcionUsuarioDTO dto) {
-        return inscripcionUsuarioService.findById(id)
-            .map(existing -> {
-                UsuarioNaturalEntity usuario = new UsuarioNaturalEntity();
-                usuario.setId(dto.getIdUsuario());
-
-                CaminataEntity caminata = new CaminataEntity();
-                caminata.setId(dto.getIdCaminata());
-
-                existing.setFechaInscripcion(dto.getFechaInscripcion());
-                existing.setEstadoPago(dto.getEstadoPago());
-                existing.setUsuario(usuario);
-                existing.setCaminata(caminata);
-
-                return ResponseEntity.ok(inscripcionUsuarioService.save(existing));
-            })
+            .map(inscripcionUsuarioService::toResponseDTO)
+            .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Eliminar una inscripción por ID", description = "Elimina una inscripción{ID}")
+    @Operation(summary = "Eliminar una inscripción por ID")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         inscripcionUsuarioService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
-

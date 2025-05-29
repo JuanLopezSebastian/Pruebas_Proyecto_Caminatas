@@ -19,7 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import co.edu.udistrital.mdp.caminatas.exceptions.BaseException.ApiError;
 import co.edu.udistrital.mdp.caminatas.exceptions.http.ConflictException;
-import co.edu.udistrital.mdp.caminatas.exceptions.http.EntityNotFoundException;
+import co.edu.udistrital.mdp.caminatas.exceptions.http.NotFoundException;
 import co.edu.udistrital.mdp.caminatas.exceptions.http.IllegalOperationException;
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -32,9 +32,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
      * @param ex the EntityNotFoundException
      * @return the ApiError object
      */
-    @ExceptionHandler(EntityNotFoundException.class)
+    @ExceptionHandler(NotFoundException.class)
     protected ResponseEntity<Object> handleEntityNotFound(
-    		EntityNotFoundException ex) {
+    		NotFoundException ex) {
         ApiError apiError = new ApiError(NOT_FOUND);
         apiError.setMessage(ex.getMessage());
         return buildResponseEntity(apiError);
